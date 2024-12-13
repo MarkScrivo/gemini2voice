@@ -4,13 +4,18 @@
   "version": "1.0",
   "description": "AI voice assistant for compliance queries",
   "permissions": [
-    "sidePanel"
+    "sidePanel",
+    "tabs"
   ],
   "host_permissions": [
     "https://gemini2voice.onrender.com/*"
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self' https://gemini2voice.onrender.com; script-src 'self' https://gemini2voice.onrender.com; style-src 'self' https://gemini2voice.onrender.com 'unsafe-inline'; connect-src 'self' https://gemini2voice.onrender.com wss://gemini2voice.onrender.com; media-src 'self' https://gemini2voice.onrender.com; img-src 'self' https://gemini2voice.onrender.com data: blob:; frame-src https://gemini2voice.onrender.com"
+    "extension_pages": "script-src 'self' https://gemini2voice.onrender.com; object-src 'self'; frame-src https://gemini2voice.onrender.com; connect-src https://gemini2voice.onrender.com; media-src https://gemini2voice.onrender.com; style-src 'self' 'unsafe-inline' https://gemini2voice.onrender.com"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
   },
   "side_panel": {
     "default_path": "sidebar.html"
