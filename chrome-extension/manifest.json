@@ -4,18 +4,13 @@
   "version": "1.0",
   "description": "AI voice assistant for compliance queries",
   "permissions": [
-    "sidePanel",
-    "tabs"
+    "sidePanel"
   ],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
   "side_panel": {
     "default_path": "sidebar.html"
   },
   "action": {
-    "default_title": "Cal Assistant",
+    "default_title": "Open Cal Assistant",
     "default_icon": {
       "16": "icons/Cal-16.png",
       "32": "icons/Cal-32.png",
