@@ -5,7 +5,9 @@
   "description": "AI voice assistant for compliance queries",
   "permissions": [
     "sidePanel",
-    "storage"
+    "storage",
+    "commands",
+    "windows"
   ],
   "background": {
     "service_worker": "background.js"
@@ -13,8 +15,17 @@
   "side_panel": {
     "default_path": "sidebar.html"
   },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open Cal Assistant"
+    }
+  },
   "action": {
-    "default_title": "Open Cal Assistant",
+    "default_title": "Open Cal Assistant (Ctrl+Shift+Y)",
     "default_icon": {
       "16": "icons/Cal-16.png",
       "32": "icons/Cal-32.png",
