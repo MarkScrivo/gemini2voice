@@ -24,23 +24,41 @@ export const FloatingWidget: React.FC<FloatingWidgetProps> = ({
   const [relationshipLevel] = useState(1);
   const { connected, volume, connect, disconnect } = useLiveAPIContext();
 
+  // Debug logging
+  useEffect(() => {
+    console.log('FloatingWidget mounted');
+    console.log('Initial state:', { isPWA, initiallyOpen, isOpen, connected });
+  }, []);
+
   // Initialize open state from prop
   useEffect(() => {
+    console.log('Setting open state:', { isPWA, initiallyOpen });
     setIsOpen(isPWA || initiallyOpen);
   }, [initiallyOpen, isPWA]);
 
   // Automatically connect/disconnect when modal opens/closes
   useEffect(() => {
-    if (isOpen) {
-      connect();
-    } else {
+    console.log('Connection state changed:', { isOpen, connected });
+    if (isOpen && !connected) {
+      console.log('Connecting...');
+      connect().catch(error => {
+        console.error('Connection error:', error);
+      });
+    } else if (!isOpen && connected) {
+      console.log('Disconnecting...');
       disconnect();
     }
-  }, [isOpen, connect, disconnect]);
+  }, [isOpen, connected, connect, disconnect]);
+
+  const handleOpen = () => {
+    console.log('Opening chat');
+    setIsOpen(true);
+  };
 
   const handleClose = () => {
     // In PWA mode, don't allow closing
     if (!isPWA) {
+      console.log('Closing chat');
       setIsOpen(false);
     }
   };
@@ -50,7 +68,7 @@ export const FloatingWidget: React.FC<FloatingWidgetProps> = ({
       {!isOpen && (
         <button 
           className="floating-button"
-          onClick={() => setIsOpen(true)}
+          onClick={handleOpen}
           aria-label="Open chat"
         >
           <Avatar active={connected} volume={volume} size="small" />

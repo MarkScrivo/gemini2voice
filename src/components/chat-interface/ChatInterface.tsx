@@ -10,7 +10,7 @@ interface Message {
 export const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
-  const { client } = useLiveAPIContext();
+  const { client, connected } = useLiveAPIContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const currentMessageRef = useRef<string>('');
@@ -21,20 +21,24 @@ export const ChatInterface: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, currentMessageRef.current]);
+  }, [messages]);
+
+  useEffect(() => {
+    console.log('WebSocket connected:', connected);
+  }, [connected]);
 
   useEffect(() => {
     const handleContent = (data: any) => {
-      console.log('Content received:', data);
+      console.log('Received content:', data);
       if (data.modelTurn?.parts) {
         const text = data.modelTurn.parts
           .filter((part: any) => part.text)
           .map((part: any) => part.text)
           .join(' ');
         
+        console.log('Extracted text:', text);
         if (text) {
           setIsTyping(true);
-          // Update the current message immediately for streaming effect
           currentMessageRef.current += text;
           // Force a re-render to show the streaming text
           setMessages(prev => {
@@ -42,11 +46,13 @@ export const ChatInterface: React.FC = () => {
             const lastMessage = newMessages[newMessages.length - 1];
             if (lastMessage && lastMessage.role === 'assistant') {
               lastMessage.content = currentMessageRef.current;
+              console.log('Updated last message:', lastMessage);
             } else {
               newMessages.push({
                 role: 'assistant',
                 content: currentMessageRef.current
               });
+              console.log('Added new message:', currentMessageRef.current);
             }
             return newMessages;
           });
@@ -55,7 +61,7 @@ export const ChatInterface: React.FC = () => {
     };
 
     const handleTurnComplete = () => {
-      console.log('Turn complete');
+      console.log('Turn complete, final message:', currentMessageRef.current);
       if (currentMessageRef.current) {
         setMessages(prev => {
           const newMessages = [...prev];
@@ -88,6 +94,7 @@ export const ChatInterface: React.FC = () => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
+    console.log('Sending message:', inputText);
     const newMessage: Message = {
       role: 'user',
       content: inputText
