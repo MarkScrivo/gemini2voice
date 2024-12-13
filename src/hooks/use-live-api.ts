@@ -29,6 +29,7 @@ export function useLiveAPI({
     [url, apiKey],
   );
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
 
   const [connected, setConnected] = useState(false);
   const [config, setConfig] = useState<LiveConfig>({
@@ -54,9 +55,22 @@ export function useLiveAPI({
   }, [audioStreamerRef]);
 
   useEffect(() => {
+    const onOpen = () => {
+      console.log('WebSocket opened');
+      setConnected(true);
+    };
+
     const onClose = (event: CloseEvent) => {
-      console.log('WebSocket connection closed:', event);
+      console.log('WebSocket closed:', event);
       setConnected(false);
+
+      // Attempt to reconnect after a delay
+      if (!event.wasClean) {
+        console.log('Connection lost, attempting to reconnect...');
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connect();
+        }, 3000);
+      }
     };
 
     const stopAudioStreamer = () => {
@@ -79,6 +93,7 @@ export function useLiveAPI({
     };
 
     client
+      .on("open", onOpen)
       .on("close", onClose)
       .on("interrupted", stopAudioStreamer)
       .on("audio", onAudio)
@@ -86,7 +101,13 @@ export function useLiveAPI({
       .on("setupcomplete", onSetupComplete);
 
     return () => {
+      // Clear any pending reconnection attempts
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+
       client
+        .off("open", onOpen)
         .off("close", onClose)
         .off("interrupted", stopAudioStreamer)
         .off("audio", onAudio)
@@ -100,14 +121,36 @@ export function useLiveAPI({
     if (!config) {
       throw new Error("config has not been set");
     }
-    client.disconnect();
-    await client.connect(config);
+    try {
+      client.disconnect();
+      await client.connect(config);
+      console.log('Connection established');
+    } catch (error) {
+      console.error('Connection error:', error);
+      throw error;
+    }
   }, [client, config]);
 
   const disconnect = useCallback(async () => {
     console.log('Disconnecting');
+    // Clear any pending reconnection attempts
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
     client.disconnect();
     setConnected(false);
+  }, [client]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      console.log('Cleaning up useLiveAPI');
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      client.disconnect();
+      audioStreamerRef.current?.stop();
+    };
   }, [client]);
 
   return {

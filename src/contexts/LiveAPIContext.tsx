@@ -1,4 +1,4 @@
-import { createContext, FC, useContext } from "react";
+import { createContext, FC, useContext, useEffect } from "react";
 import { useLiveAPI, UseLiveAPIResults } from "../hooks/use-live-api";
 
 const LiveAPIContext = createContext<UseLiveAPIResults | undefined>(undefined);
@@ -20,7 +20,38 @@ export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   });
 
   // Debug logging
-  console.log('LiveAPIProvider initialized with:', { url, hasApiKey: !!apiKey });
+  useEffect(() => {
+    console.log('LiveAPIProvider initialized with:', { 
+      url, 
+      hasApiKey: !!apiKey,
+      connected: liveAPI.connected
+    });
+
+    // Log WebSocket events
+    const handleLog = (log: any) => {
+      console.log('WebSocket log:', log);
+    };
+
+    const handleContent = (content: any) => {
+      console.log('WebSocket content:', content);
+    };
+
+    const handleTurnComplete = () => {
+      console.log('WebSocket turn complete');
+    };
+
+    liveAPI.client
+      .on('log', handleLog)
+      .on('content', handleContent)
+      .on('turncomplete', handleTurnComplete);
+
+    return () => {
+      liveAPI.client
+        .off('log', handleLog)
+        .off('content', handleContent)
+        .off('turncomplete', handleTurnComplete);
+    };
+  }, [url, apiKey, liveAPI]);
 
   return (
     <LiveAPIContext.Provider value={liveAPI}>
