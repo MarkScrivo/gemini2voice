@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice Assistant Test</title>
-    <link href="./static/css/main.dd197b4c.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,6 +62,9 @@
         </div>
     </div>
 
+    <!-- Root element for React -->
+    <div id="root"></div>
+
     <script>
         window.VOICE_ASSISTANT_CONFIG = {
             apiKey: 'AIzaSyDRh0uMq1_5beuhVW_B-kTZegWkAok8R3Y',
@@ -74,19 +76,22 @@
         };
 
         // Debug logging
+        window.addEventListener('load', function() {
+            console.log('Config loaded:', window.VOICE_ASSISTANT_CONFIG);
+        });
+
+        // Error handling
         window.addEventListener('error', function(event) {
+            console.error('Error:', event);
             const errorDiv = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
             if (errorDiv && errorText) {
                 errorText.textContent = event.message;
                 errorDiv.classList.add('visible');
-                console.error('Error:', event.message);
             }
         });
-
-        // Log when config is loaded
-        console.log('Config loaded:', window.VOICE_ASSISTANT_CONFIG);
     </script>
-    <script src="./static/js/main.bb788603.js"></script>
+    <script src="./static/js/main.885c881e.js"></script>
+    <link href="./static/css/main.6bdbab6d.css" rel="stylesheet">
 </body>
 </html>
