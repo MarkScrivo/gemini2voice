@@ -4,8 +4,13 @@
   "version": "1.0",
   "description": "AI voice assistant for compliance queries",
   "permissions": [
-    "sidePanel"
+    "sidePanel",
+    "tabs"
   ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "side_panel": {
     "default_path": "sidebar.html"
   },

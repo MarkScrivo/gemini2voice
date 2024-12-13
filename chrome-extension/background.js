@@ -1,11 +1,19 @@
 // Enable side panel when extension is installed
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
-    .catch((error) => console.error('Failed to set panel behavior:', error));
+  // Set default side panel options
+  chrome.sidePanel.setOptions({
+    enabled: true
+  });
 });
 
 // Handle extension icon click
 chrome.action.onClicked.addListener((tab) => {
-  chrome.sidePanel.open({ windowId: tab.windowId })
-    .catch((error) => console.error('Failed to open side panel:', error));
+  // Show the side panel
+  chrome.sidePanel.setOptions({
+    enabled: true
+  }).then(() => {
+    chrome.sidePanel.open({ windowId: tab.windowId });
+  }).catch((error) => {
+    console.error('Error showing side panel:', error);
+  });
 });
