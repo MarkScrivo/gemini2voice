@@ -6,6 +6,12 @@
   "permissions": [
     "sidePanel"
   ],
+  "host_permissions": [
+    "https://gemini2voice.onrender.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://gemini2voice.onrender.com"
+  },
   "side_panel": {
     "default_path": "sidebar.html"
   },
