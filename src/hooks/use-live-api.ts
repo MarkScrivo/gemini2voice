@@ -1,19 +1,3 @@
-/**
- * Copyright 2024 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   MultimodalLiveAPIClientConnection,
@@ -38,6 +22,8 @@ export function useLiveAPI({
   url,
   apiKey,
 }: MultimodalLiveAPIClientConnection): UseLiveAPIResults {
+  console.log('useLiveAPI initialized with:', { url, hasApiKey: !!apiKey });
+
   const client = useMemo(
     () => new MultimodalLiveClient({ url, apiKey }),
     [url, apiKey],
@@ -54,55 +40,75 @@ export function useLiveAPI({
   useEffect(() => {
     if (!audioStreamerRef.current) {
       audioContext({ id: "audio-out" }).then((audioCtx: AudioContext) => {
+        console.log('Audio context initialized');
         audioStreamerRef.current = new AudioStreamer(audioCtx);
         audioStreamerRef.current
           .addWorklet<any>("vumeter-out", VolMeterWorket, (ev: any) => {
             setVolume(ev.data.volume);
           })
           .then(() => {
-            // Successfully added worklet
+            console.log('Audio worklet added successfully');
           });
       });
     }
   }, [audioStreamerRef]);
 
   useEffect(() => {
-    const onClose = () => {
+    const onClose = (event: CloseEvent) => {
+      console.log('WebSocket connection closed:', event);
       setConnected(false);
     };
 
-    const stopAudioStreamer = () => audioStreamerRef.current?.stop();
+    const stopAudioStreamer = () => {
+      console.log('Stopping audio streamer');
+      audioStreamerRef.current?.stop();
+    };
 
-    const onAudio = (data: ArrayBuffer) =>
+    const onAudio = (data: ArrayBuffer) => {
+      console.log('Received audio data:', data.byteLength, 'bytes');
       audioStreamerRef.current?.addPCM16(new Uint8Array(data));
+    };
+
+    const onContent = (content: any) => {
+      console.log('Received content:', content);
+    };
+
+    const onSetupComplete = () => {
+      console.log('Setup complete');
+      setConnected(true);
+    };
 
     client
       .on("close", onClose)
       .on("interrupted", stopAudioStreamer)
-      .on("audio", onAudio);
+      .on("audio", onAudio)
+      .on("content", onContent)
+      .on("setupcomplete", onSetupComplete);
 
     return () => {
       client
         .off("close", onClose)
         .off("interrupted", stopAudioStreamer)
-        .off("audio", onAudio);
+        .off("audio", onAudio)
+        .off("content", onContent)
+        .off("setupcomplete", onSetupComplete);
     };
   }, [client]);
 
   const connect = useCallback(async () => {
-    console.log(config);
+    console.log('Connecting with config:', config);
     if (!config) {
       throw new Error("config has not been set");
     }
     client.disconnect();
     await client.connect(config);
-    setConnected(true);
-  }, [client, setConnected, config]);
+  }, [client, config]);
 
   const disconnect = useCallback(async () => {
+    console.log('Disconnecting');
     client.disconnect();
     setConnected(false);
-  }, [setConnected, client]);
+  }, [client]);
 
   return {
     client,

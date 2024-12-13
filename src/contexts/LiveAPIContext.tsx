@@ -1,15 +1,26 @@
-import { createContext, FC, ReactNode, useContext } from "react";
+import { createContext, FC, useContext } from "react";
 import { useLiveAPI, UseLiveAPIResults } from "../hooks/use-live-api";
-import { LiveAPIProviderProps } from "../types";
 
 const LiveAPIContext = createContext<UseLiveAPIResults | undefined>(undefined);
+
+export type LiveAPIProviderProps = {
+  children: React.ReactNode;
+  url?: string;
+  apiKey: string;
+};
 
 export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   url,
   apiKey,
   children,
 }) => {
-  const liveAPI = useLiveAPI({ url, apiKey });
+  const liveAPI = useLiveAPI({ 
+    url: url || 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent',
+    apiKey 
+  });
+
+  // Debug logging
+  console.log('LiveAPIProvider initialized with:', { url, hasApiKey: !!apiKey });
 
   return (
     <LiveAPIContext.Provider value={liveAPI}>
