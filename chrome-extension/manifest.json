@@ -10,7 +10,7 @@
     "https://gemini2voice.onrender.com/*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://gemini2voice.onrender.com"
+    "extension_pages": "default-src 'self' https://gemini2voice.onrender.com; script-src 'self' https://gemini2voice.onrender.com; style-src 'self' https://gemini2voice.onrender.com 'unsafe-inline'; connect-src 'self' https://gemini2voice.onrender.com wss://gemini2voice.onrender.com; media-src 'self' https://gemini2voice.onrender.com; img-src 'self' https://gemini2voice.onrender.com data: blob:; frame-src https://gemini2voice.onrender.com"
   },
   "side_panel": {
     "default_path": "sidebar.html"
