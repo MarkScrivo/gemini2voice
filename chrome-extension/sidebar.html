@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cal Assistant</title>
-    <link href="https://gemini2voice.onrender.com/static/css/main.c432663d.css" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -12,63 +11,100 @@
             width: 100%;
             height: 100vh;
             overflow: hidden;
-            background: var(--Neutral-10);
+            background: #1c1f21;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
-        #root {
+        #app {
             width: 100%;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Override floating widget styles for sidebar */
-        .floating-widget-container {
-            position: static !important;
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .chat-modal {
-            position: static !important;
-            width: 100% !important;
-            height: 100% !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-        }
-
-        .modal-content {
+        .chat-container {
             flex: 1;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            gap: 16px;
+            overflow-y: auto;
         }
 
-        /* Compact header for sidebar */
-        .modal-header {
-            padding: 8px 12px !important;
+        .input-container {
+            padding: 16px;
+            border-top: 1px solid #2a2f31;
+            background: #1c1f21;
+            display: flex;
+            gap: 8px;
         }
 
-        /* Compact avatar for sidebar */
-        .avatar-section {
-            padding: 12px !important;
+        input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #2a2f31;
+            border-radius: 8px;
+            background: #232729;
+            color: white;
+            font-size: 14px;
         }
 
-        /* Compact footer for sidebar */
-        .modal-footer {
-            padding: 8px 12px !important;
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #1f94ff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #1a7fd9;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            background: #232729;
+            max-width: 80%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #1f94ff;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: #1f94ff;
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="loading">Loading Cal Assistant...</div>
     <script>
-        window.VOICE_ASSISTANT_CONFIG = {
-            apiKey: 'AIzaSyDRh0uMq1_5beuhVW_B-kTZegWkAok8R3Y',
-            theme: 'dark',
-            initiallyOpen: true,
-            agentName: 'Compliance Cal'
-        };
+        // Initialize the app after a short delay to ensure styles are applied
+        setTimeout(() => {
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.style.background = '#1c1f21';
+            iframe.allow = 'microphone';
+            iframe.src = 'https://gemini2voice.onrender.com/example.html';
+            
+            iframe.onload = () => {
+                document.getElementById('loading').style.display = 'none';
+            };
+            
+            document.body.appendChild(iframe);
+        }, 500);
     </script>
-    <script src="https://gemini2voice.onrender.com/static/js/main.b6603881.js"></script>
 </body>
 </html>

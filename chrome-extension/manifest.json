@@ -7,6 +7,9 @@
     "sidePanel",
     "storage"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "side_panel": {
     "default_path": "sidebar.html"
   },
