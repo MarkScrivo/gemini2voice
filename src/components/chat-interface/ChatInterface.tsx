@@ -5,7 +5,6 @@ import { useLiveAPIContext } from '../../contexts/LiveAPIContext';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  timestamp: string;
 }
 
 export const ChatInterface: React.FC = () => {
@@ -22,10 +21,11 @@ export const ChatInterface: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, currentMessageRef.current]);
 
   useEffect(() => {
     const handleContent = (data: any) => {
+      console.log('Content received:', data);
       if (data.modelTurn?.parts) {
         const text = data.modelTurn.parts
           .filter((part: any) => part.text)
@@ -34,18 +34,42 @@ export const ChatInterface: React.FC = () => {
         
         if (text) {
           setIsTyping(true);
+          // Update the current message immediately for streaming effect
           currentMessageRef.current += text;
+          // Force a re-render to show the streaming text
+          setMessages(prev => {
+            const newMessages = [...prev];
+            const lastMessage = newMessages[newMessages.length - 1];
+            if (lastMessage && lastMessage.role === 'assistant') {
+              lastMessage.content = currentMessageRef.current;
+            } else {
+              newMessages.push({
+                role: 'assistant',
+                content: currentMessageRef.current
+              });
+            }
+            return newMessages;
+          });
         }
       }
     };
 
     const handleTurnComplete = () => {
+      console.log('Turn complete');
       if (currentMessageRef.current) {
-        setMessages(prev => [...prev, {
-          role: 'assistant',
-          content: currentMessageRef.current,
-          timestamp: new Date().toLocaleTimeString()
-        }]);
+        setMessages(prev => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
+          if (lastMessage && lastMessage.role === 'assistant') {
+            lastMessage.content = currentMessageRef.current;
+          } else {
+            newMessages.push({
+              role: 'assistant',
+              content: currentMessageRef.current
+            });
+          }
+          return newMessages;
+        });
         currentMessageRef.current = '';
         setIsTyping(false);
       }
@@ -53,11 +77,6 @@ export const ChatInterface: React.FC = () => {
 
     client.on('content', handleContent);
     client.on('turncomplete', handleTurnComplete);
-
-    // Debug logging
-    client.on('log', (log) => {
-      console.log('Client log:', log);
-    });
 
     return () => {
       client.off('content', handleContent);
@@ -71,8 +90,7 @@ export const ChatInterface: React.FC = () => {
 
     const newMessage: Message = {
       role: 'user',
-      content: inputText,
-      timestamp: new Date().toLocaleTimeString()
+      content: inputText
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -85,24 +103,15 @@ export const ChatInterface: React.FC = () => {
       <div className="messages">
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.role}`}>
-            <div className="message-header">
-              <span className="sender">{message.role === 'assistant' ? 'Cal' : 'You'}</span>
-              <span className="timestamp">{message.timestamp}</span>
-            </div>
             <div className="message-content">
               {message.content}
             </div>
           </div>
         ))}
-        {isTyping && (
+        {isTyping && currentMessageRef.current && (
           <div className="message assistant">
-            <div className="message-header">
-              <span className="sender">Cal</span>
-            </div>
-            <div className="message-content typing">
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
+            <div className="message-content">
+              {currentMessageRef.current}
             </div>
           </div>
         )}
