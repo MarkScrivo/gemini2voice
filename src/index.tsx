@@ -4,16 +4,15 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-// Get query parameters
-const urlParams = new URLSearchParams(window.location.search);
-
-// Set default configuration
-window.VOICE_ASSISTANT_CONFIG = {
-  apiKey: process.env.REACT_APP_GEMINI_API_KEY || '',
-  initiallyOpen: true,
-  agentName: 'Compliance Cal',
-  theme: 'dark'
-};
+// Set default configuration if not already set
+if (!window.VOICE_ASSISTANT_CONFIG) {
+  window.VOICE_ASSISTANT_CONFIG = {
+    apiKey: process.env.REACT_APP_GEMINI_API_KEY || '',
+    initiallyOpen: true,
+    agentName: 'Compliance Cal',
+    theme: 'dark'
+  };
+}
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
