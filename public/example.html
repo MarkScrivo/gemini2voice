@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Assistant Test</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1f94ff" />
+    <meta name="description" content="Voice-enabled AI assistant for compliance queries" />
+    
+    <link rel="icon" href="/Cal.png" />
+    <link rel="apple-touch-icon" href="/Cal-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <title>Cal Voice Assistant - Example</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,9 +47,11 @@
             display: block;
         }
     </style>
-    <link href="./static/css/main.6bdbab6d.css" rel="stylesheet">
+    <link href="/static/css/main.6bdbab6d.css" rel="stylesheet">
 </head>
 <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
     <div class="content">
         <h1>Voice Assistant Test Page</h1>
         <p>The voice assistant widget should appear in the bottom-right corner. Click it to open the chat interface.</p>
@@ -63,12 +72,7 @@
         </div>
     </div>
 
-    <!-- Root element for React -->
     <div id="root"></div>
-
-    <!-- Load React -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
     <script>
         window.VOICE_ASSISTANT_CONFIG = {
@@ -83,21 +87,50 @@
         // Debug logging
         window.addEventListener('load', function() {
             console.log('Config loaded:', window.VOICE_ASSISTANT_CONFIG);
-            console.log('React version:', React.version);
-            console.log('ReactDOM version:', ReactDOM.version);
+            console.log('Root element:', document.getElementById('root'));
         });
 
-        // Error handling
+        // Error handling with more details
         window.addEventListener('error', function(event) {
-            console.error('Error:', event);
+            console.error('Error details:', {
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                error: event.error
+            });
             const errorDiv = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
             if (errorDiv && errorText) {
-                errorText.textContent = event.message;
+                errorText.textContent = `${event.message} (${event.filename}:${event.lineno})`;
                 errorDiv.classList.add('visible');
             }
         });
+
+        // Unhandled promise rejection handling
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            if (errorDiv && errorText) {
+                errorText.textContent = `Promise error: ${event.reason}`;
+                errorDiv.classList.add('visible');
+            }
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
     </script>
-    <script src="./static/js/main.775447c1.js"></script>
+    <script defer src="/static/js/main.775447c1.js"></script>
 </body>
 </html>
