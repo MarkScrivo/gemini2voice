@@ -1,19 +1,3 @@
-/**
- * Copyright 2024 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import { Content, GenerativeContentBlob, Part } from "@google/generative-ai";
 import { EventEmitter } from "eventemitter3";
 import { difference } from "lodash";
@@ -39,9 +23,6 @@ import {
 } from "../multimodal-live-types";
 import { blobToJSON, base64ToArrayBuffer } from "./utils";
 
-/**
- * the events that this client will emit
- */
 interface MultimodalLiveClientEventTypes {
   open: () => void;
   log: (log: StreamingLog) => void;
@@ -60,30 +41,26 @@ export type MultimodalLiveAPIClientConnection = {
   apiKey: string;
 };
 
-/**
- * A event-emitting class that manages the connection to the websocket and emits
- * events to the rest of the application.
- * If you dont want to use react you can still use this.
- */
 export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEventTypes> {
   public ws: WebSocket | null = null;
   protected config: LiveConfig | null = null;
   public url: string = "";
-  public getConfig() {
-    return { ...this.config };
-  }
 
   constructor({ url, apiKey }: MultimodalLiveAPIClientConnection) {
     super();
+    console.log('Initializing MultimodalLiveClient');
     url =
       url ||
       `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
     url += `?key=${apiKey}`;
     this.url = url;
     this.send = this.send.bind(this);
+    this.sendRealtimeInput = this.sendRealtimeInput.bind(this);
+    this.sendToolResponse = this.sendToolResponse.bind(this);
   }
 
   log(type: string, message: StreamingLog["message"]) {
+    console.log(`[${type}]`, message);
     const log: StreamingLog = {
       date: new Date(),
       type,
@@ -93,26 +70,32 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   }
 
   connect(config: LiveConfig): Promise<boolean> {
+    console.log('Connecting to WebSocket with config:', config);
     this.config = config;
 
     const ws = new WebSocket(this.url);
 
     ws.addEventListener("message", async (evt: MessageEvent) => {
+      console.log('WebSocket message received:', evt);
       if (evt.data instanceof Blob) {
         this.receive(evt.data);
       } else {
         console.log("non blob message", evt);
       }
     });
+
     return new Promise((resolve, reject) => {
       const onError = (ev: Event) => {
+        console.error('WebSocket error:', ev);
         this.disconnect(ws);
         const message = `Could not connect to "${this.url}"`;
         this.log(`server.${ev.type}`, message);
         reject(new Error(message));
       };
+
       ws.addEventListener("error", onError);
       ws.addEventListener("open", (ev: Event) => {
+        console.log('WebSocket opened');
         if (!this.config) {
           reject("Invalid config sent to `connect(config)`");
           return;
@@ -130,7 +113,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
 
         ws.removeEventListener("error", onError);
         ws.addEventListener("close", (ev: CloseEvent) => {
-          console.log(ev);
+          console.log('WebSocket closed:', ev);
           this.disconnect(ws);
           let reason = ev.reason || "";
           if (reason.toLowerCase().includes("error")) {
@@ -155,8 +138,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   }
 
   disconnect(ws?: WebSocket) {
-    // could be that this is an old websocket and theres already a new instance
-    // only close it if its still the correct reference
+    console.log('Disconnecting WebSocket');
     if ((!ws || this.ws === ws) && this.ws) {
       this.ws.close();
       this.ws = null;
@@ -167,9 +149,12 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   }
 
   protected async receive(blob: Blob) {
+    console.log('Processing received blob:', blob);
     const response: LiveIncomingMessage = (await blobToJSON(
       blob,
     )) as LiveIncomingMessage;
+    console.log('Parsed response:', response);
+
     if (isToolCallMessage(response)) {
       this.log("server.toolCall", response);
       this.emit("toolcall", response.toolCall);
@@ -182,14 +167,14 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     }
 
     if (isSetupCompleteMessage(response)) {
+      console.log('Setup complete');
       this.log("server.send", "setupComplete");
       this.emit("setupcomplete");
       return;
     }
 
-    // this json also might be `contentUpdate { interrupted: true }`
-    // or contentUpdate { end_of_turn: true }
     if (isServerContenteMessage(response)) {
+      console.log('Processing server content:', response);
       const { serverContent } = response;
       if (isInterrupted(serverContent)) {
         this.log("receive.serverContent", "interrupted");
@@ -197,12 +182,13 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
         return;
       }
       if (isTurnComplete(serverContent)) {
+        console.log('Turn complete');
         this.log("server.send", "turnComplete");
         this.emit("turncomplete");
-        //plausible theres more to the message, continue
       }
 
       if (isModelTurn(serverContent)) {
+        console.log('Processing model turn:', serverContent);
         let parts: Part[] = serverContent.modelTurn.parts;
 
         // when its audio that is returned for modelTurn
@@ -213,7 +199,6 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
 
         // strip the audio parts out of the modelTurn
         const otherParts = difference(parts, audioParts);
-        // console.log("otherParts", otherParts);
 
         base64s.forEach((b64) => {
           if (b64) {
@@ -227,7 +212,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
         }
 
         parts = otherParts;
-
+        console.log('Emitting content with parts:', parts);
         const content: ModelTurn = { modelTurn: { parts } };
         this.emit("content", content);
         this.log(`server.content`, response);
@@ -237,10 +222,8 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     }
   }
 
-  /**
-   * send realtimeInput, this is base64 chunks of "audio/pcm" and/or "image/jpg"
-   */
   sendRealtimeInput(chunks: GenerativeContentBlob[]) {
+    console.log('Sending realtime input:', chunks);
     let hasAudio = false;
     let hasVideo = false;
     for (let i = 0; i < chunks.length; i++) {
@@ -273,10 +256,8 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     this.log(`client.realtimeInput`, message);
   }
 
-  /**
-   *  send a response to a function call and provide the id of the functions you are responding to
-   */
   sendToolResponse(toolResponse: ToolResponseMessage["toolResponse"]) {
+    console.log('Sending tool response:', toolResponse);
     const message: ToolResponseMessage = {
       toolResponse,
     };
@@ -285,10 +266,8 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     this.log(`client.toolResponse`, message);
   }
 
-  /**
-   * send normal content parts such as { text }
-   */
   send(parts: Part | Part[], turnComplete: boolean = true) {
+    console.log('Sending parts:', parts);
     parts = Array.isArray(parts) ? parts : [parts];
     const content: Content = {
       role: "user",
@@ -306,11 +285,8 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
     this.log(`client.send`, clientContentRequest);
   }
 
-  /**
-   *  used internally to send all messages
-   *  don't use directly unless trying to send an unsupported message type
-   */
   _sendDirect(request: object) {
+    console.log('Sending request:', request);
     if (!this.ws) {
       throw new Error("WebSocket is not connected");
     }
