@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant Test</title>
+    <link href="./static/css/main.c432663d.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .error {
+            background: #fde8e8;
+            border-left: 4px solid #f56565;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+        .error.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Voice Assistant Test Page</h1>
+        <p>The voice assistant widget should appear in the bottom-right corner. Click it to open the chat interface.</p>
+
+        <div class="note">
+            <strong>Features:</strong>
+            <ul>
+                <li>Click the floating button to open the chat interface</li>
+                <li>Use voice or text to interact</li>
+                <li>Watch the avatar animate when speaking</li>
+                <li>See the pulsing ring effect during audio activity</li>
+            </ul>
+        </div>
+
+        <div id="errorMessage" class="error">
+            <strong>Error:</strong> <span id="errorText"></span>
+        </div>
+    </div>
+
+    <script>
+        window.VOICE_ASSISTANT_CONFIG = {
+            apiKey: 'AIzaSyDRh0uMq1_5beuhVW_B-kTZegWkAok8R3Y',
+            position: 'bottom-right',
+            theme: 'dark',
+            initiallyOpen: false,
+            agentName: 'Compliance Cal'
+        };
+
+        // Error handling
+        window.addEventListener('error', function(event) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            if (errorDiv && errorText) {
+                errorText.textContent = event.message;
+                errorDiv.classList.add('visible');
+            }
+        });
+    </script>
+    <script src="./static/js/main.b6603881.js"></script>
+</body>
+</html>

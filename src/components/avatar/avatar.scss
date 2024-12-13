@@ -1,0 +1,89 @@
+.avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+
+  &.small {
+    width: 64px;
+    height: 64px;
+
+    .avatar-icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    .audio-ring {
+      border-width: 2px;
+    }
+  }
+
+  &.large {
+    width: 120px;
+    height: 120px;
+
+    .avatar-icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    .audio-ring {
+      border-width: 3px;
+    }
+  }
+
+  .avatar-icon {
+    position: relative;
+    z-index: 2;
+    object-fit: contain;
+    transition: transform 0.15s ease-out;
+  }
+
+  .audio-pulse-wrapper {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .audio-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    border: 3px solid var(--Blue-500);
+    opacity: 0;
+    transition: all 0.15s ease-out;
+
+    &.active {
+      opacity: 0.6;
+      box-shadow: 0 0 10px rgba(31, 148, 255, 0.3);
+    }
+  }
+
+  &.speaking {
+    .avatar-icon {
+      animation: subtle-bounce 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+  }
+}
+
+@keyframes subtle-bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

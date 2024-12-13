@@ -1,35 +1,55 @@
-/**
- * Copyright 2024 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+type VoiceAssistantConfig = {
+  apiKey: string;
+  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  theme?: 'dark' | 'light';
+  initiallyOpen?: boolean;
+  agentName?: string;
+};
+
+declare global {
+  interface Window {
+    VOICE_ASSISTANT_CONFIG?: VoiceAssistantConfig;
+  }
+}
+
+// Create root element if it doesn't exist
+let rootElement = document.getElementById('voice-assistant-root');
+if (!rootElement) {
+  rootElement = document.createElement('div');
+  rootElement.id = 'voice-assistant-root';
+  document.body.appendChild(rootElement);
+}
+
+// Get configuration from window object or environment
+const defaultConfig: VoiceAssistantConfig = {
+  apiKey: process.env.REACT_APP_GEMINI_API_KEY || '',
+  position: 'bottom-right',
+  theme: 'dark',
+  initiallyOpen: false,
+  agentName: 'Compliance Cal'
+};
+
+const userConfig = window.VOICE_ASSISTANT_CONFIG || {};
+const config = { ...defaultConfig, ...userConfig };
+
+if (!config.apiKey) {
+  console.error('No API key provided. Please set VOICE_ASSISTANT_CONFIG.apiKey or REACT_APP_GEMINI_API_KEY');
+}
+
+const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <App 
+      apiKey={config.apiKey}
+      position={config.position}
+      theme={config.theme}
+      initiallyOpen={config.initiallyOpen}
+      agentName={config.agentName}
+    />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

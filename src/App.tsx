@@ -14,57 +14,63 @@
  * limitations under the License.
  */
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "./App.scss";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
-import SidePanel from "./components/side-panel/SidePanel";
-import { Altair } from "./components/altair/Altair";
-import ControlTray from "./components/control-tray/ControlTray";
-import cn from "classnames";
+import { FloatingWidget } from "./components/floating-widget/FloatingWidget";
 
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY as string;
-if (typeof API_KEY !== "string") {
-  throw new Error("set REACT_APP_GEMINI_APIK_KEY in .env");
+interface AppProps {
+  apiKey: string;
+  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  theme?: 'dark' | 'light';
+  initiallyOpen?: boolean;
+  agentName?: string;
 }
 
 const host = "generativelanguage.googleapis.com";
 const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
 
-function App() {
-  // this video reference is used for displaying the active stream, whether that is the webcam or screen capture
-  // feel free to style as you see fit
+function App({ 
+  apiKey,
+  position = 'bottom-right',
+  theme = 'dark',
+  initiallyOpen = false,
+  agentName = 'Compliance Cal'
+}: AppProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  // either the screen capture, the video or null, if null we hide it
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
 
-  return (
-    <div className="App">
-      <LiveAPIProvider url={uri} apiKey={API_KEY}>
-        <div className="streaming-console">
-          <SidePanel />
-          <main>
-            <div className="main-app-area">
-              {/* APP goes here */}
-              <Altair />
-              <video
-                className={cn("stream", {
-                  hidden: !videoRef.current || !videoStream,
-                })}
-                ref={videoRef}
-                autoPlay
-                playsInline
-              />
-            </div>
+  useEffect(() => {
+    // Add Material Icons font
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200';
+    document.head.appendChild(link);
 
-            <ControlTray
-              videoRef={videoRef}
-              supportsVideo={true}
-              onVideoStreamChange={setVideoStream}
-            >
-              {/* put your own buttons here */}
-            </ControlTray>
-          </main>
-        </div>
+    // Add theme class to body
+    document.body.classList.add(`theme-${theme}`);
+
+    return () => {
+      document.head.removeChild(link);
+      document.body.classList.remove(`theme-${theme}`);
+    };
+  }, [theme]);
+
+  return (
+    <div className={`App position-${position}`}>
+      <LiveAPIProvider url={uri} apiKey={apiKey}>
+        <FloatingWidget
+          videoRef={videoRef}
+          onVideoStreamChange={setVideoStream}
+          initiallyOpen={initiallyOpen}
+          agentName={agentName}
+        />
+        <video
+          className={`stream ${!videoRef.current || !videoStream ? 'hidden' : ''}`}
+          ref={videoRef}
+          autoPlay
+          playsInline
+        />
       </LiveAPIProvider>
     </div>
   );
