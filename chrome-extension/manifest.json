@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Compliance Cal Assistant",
+  "version": "1.0",
+  "description": "AI voice assistant for compliance queries",
+  "permissions": [
+    "sidePanel",
+    "storage"
+  ],
+  "side_panel": {
+    "default_path": "sidebar.html"
+  },
+  "action": {
+    "default_title": "Open Cal Assistant",
+    "default_icon": {
+      "16": "icons/Cal-16.png",
+      "32": "icons/Cal-32.png",
+      "48": "icons/Cal-48.png",
+      "128": "icons/Cal-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/Cal-16.png",
+    "32": "icons/Cal-32.png",
+    "48": "icons/Cal-48.png",
+    "128": "icons/Cal-128.png"
+  }
+}

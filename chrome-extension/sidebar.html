@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cal Assistant</title>
+    <link href="https://gemini2voice.onrender.com/static/css/main.c432663d.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--Neutral-10);
+        }
+
+        #root {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Override floating widget styles for sidebar */
+        .floating-widget-container {
+            position: static !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chat-modal {
+            position: static !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Compact header for sidebar */
+        .modal-header {
+            padding: 8px 12px !important;
+        }
+
+        /* Compact avatar for sidebar */
+        .avatar-section {
+            padding: 12px !important;
+        }
+
+        /* Compact footer for sidebar */
+        .modal-footer {
+            padding: 8px 12px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        window.VOICE_ASSISTANT_CONFIG = {
+            apiKey: 'AIzaSyDRh0uMq1_5beuhVW_B-kTZegWkAok8R3Y',
+            theme: 'dark',
+            initiallyOpen: true,
+            agentName: 'Compliance Cal'
+        };
+    </script>
+    <script src="https://gemini2voice.onrender.com/static/js/main.b6603881.js"></script>
+</body>
+</html>
