@@ -5,6 +5,7 @@ import { useLiveAPIContext } from '../../contexts/LiveAPIContext';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  timestamp: string;
 }
 
 export const ChatInterface: React.FC = () => {
@@ -42,7 +43,8 @@ export const ChatInterface: React.FC = () => {
       if (currentMessageRef.current) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: currentMessageRef.current
+          content: currentMessageRef.current,
+          timestamp: new Date().toLocaleTimeString()
         }]);
         currentMessageRef.current = '';
         setIsTyping(false);
@@ -64,7 +66,8 @@ export const ChatInterface: React.FC = () => {
 
     const newMessage: Message = {
       role: 'user',
-      content: inputText
+      content: inputText,
+      timestamp: new Date().toLocaleTimeString()
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -77,6 +80,10 @@ export const ChatInterface: React.FC = () => {
       <div className="messages">
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.role}`}>
+            <div className="message-header">
+              <span className="sender">{message.role === 'assistant' ? 'Cal' : 'You'}</span>
+              <span className="timestamp">{message.timestamp}</span>
+            </div>
             <div className="message-content">
               {message.content}
             </div>
@@ -84,6 +91,9 @@ export const ChatInterface: React.FC = () => {
         ))}
         {isTyping && (
           <div className="message assistant">
+            <div className="message-header">
+              <span className="sender">Cal</span>
+            </div>
             <div className="message-content typing">
               <span className="dot"></span>
               <span className="dot"></span>
