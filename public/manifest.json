@@ -29,6 +29,11 @@
     }
   ],
   "categories": ["productivity", "utilities"],
-  "orientation": "any",
-  "prefer_related_applications": false
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay"],
+  "window": {
+    "width": 400,
+    "height": 600
+  }
 }

@@ -18,14 +18,16 @@ export const FloatingWidget: React.FC<FloatingWidgetProps> = ({
   initiallyOpen = false,
   agentName = 'Compliance Cal'
 }) => {
-  const [isOpen, setIsOpen] = useState(initiallyOpen);
+  // Check if running as standalone PWA
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+  const [isOpen, setIsOpen] = useState(isPWA || initiallyOpen);
   const [relationshipLevel] = useState(1);
   const { connected, volume, connect, disconnect } = useLiveAPIContext();
 
   // Initialize open state from prop
   useEffect(() => {
-    setIsOpen(initiallyOpen);
-  }, [initiallyOpen]);
+    setIsOpen(isPWA || initiallyOpen);
+  }, [initiallyOpen, isPWA]);
 
   // Automatically connect/disconnect when modal opens/closes
   useEffect(() => {
@@ -37,7 +39,10 @@ export const FloatingWidget: React.FC<FloatingWidgetProps> = ({
   }, [isOpen, connect, disconnect]);
 
   const handleClose = () => {
-    setIsOpen(false);
+    // In PWA mode, don't allow closing
+    if (!isPWA) {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -82,13 +87,15 @@ export const FloatingWidget: React.FC<FloatingWidgetProps> = ({
                 onVideoStreamChange={onVideoStreamChange}
               />
             </div>
-            <button 
-              className="close-button"
-              onClick={handleClose}
-              aria-label="Close chat"
-            >
-              ✕
-            </button>
+            {!isPWA && (
+              <button 
+                className="close-button"
+                onClick={handleClose}
+                aria-label="Close chat"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
       )}
