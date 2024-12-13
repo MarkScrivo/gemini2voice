@@ -2,11 +2,17 @@
   "name": "Compliance Cal Voice Assistant",
   "short_name": "Cal Voice",
   "description": "Voice-enabled AI assistant for compliance queries",
-  "start_url": "/",
+  "start_url": ".",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1c1f21",
   "theme_color": "#1f94ff",
   "icons": [
+    {
+      "src": "Cal.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
     {
       "src": "Cal-192.png",
       "sizes": "192x192",
@@ -35,5 +41,21 @@
   "window": {
     "width": 400,
     "height": 600
-  }
+  },
+  "permissions": [
+    "microphone"
+  ],
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Open Chat",
+      "url": "/",
+      "description": "Open the chat interface"
+    },
+    {
+      "name": "Example Page",
+      "url": "/example.html",
+      "description": "View the example implementation"
+    }
+  ]
 }
