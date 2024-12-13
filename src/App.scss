@@ -14,19 +14,43 @@ body {
   justify-content: center;
   background: var(--Neutral-10);
 
-  &.position-bottom-right .floating-widget-container {
-    position: static;
-    width: 360px;
-    height: 600px;
+  &.embedded {
+    // Only apply these styles when embedded
+    .floating-widget-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: auto;
+      height: auto;
+    }
+
+    .chat-modal {
+      position: fixed !important;
+      bottom: 90px !important;
+      right: 20px !important;
+      width: 360px !important;
+      height: 600px !important;
+      margin: 0 !important;
+      border-radius: 24px !important;
+    }
   }
 
-  .chat-modal {
-    position: static !important;
-    margin: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 12px;
-    overflow: hidden;
+  &.standalone {
+    // Full screen mode styles
+    .floating-widget-container {
+      position: static;
+      width: 360px;
+      height: 600px;
+    }
+
+    .chat-modal {
+      position: static !important;
+      margin: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 12px;
+      overflow: hidden;
+    }
   }
 
   .stream {
