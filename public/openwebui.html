@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+    <link href="./static/css/main.c432663d.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: var(--Neutral-10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #voice-assistant-root {
+            width: 100%;
+            height: 100%;
+        }
+        .chat-modal {
+            position: relative !important;
+            bottom: auto !important;
+            right: auto !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="voice-assistant-root"></div>
+    <script>
+        window.VOICE_ASSISTANT_CONFIG = {
+            apiKey: 'AIzaSyDRh0uMq1_5beuhVW_B-kTZegWkAok8R3Y',
+            theme: 'dark',
+            initiallyOpen: true,
+            agentName: 'Compliance Cal'
+        };
+    </script>
+    <script src="./static/js/main.b6603881.js"></script>
+</body>
+</html>
