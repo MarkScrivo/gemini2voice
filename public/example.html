@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice Assistant Test</title>
-    <link href="./static/css/main.c432663d.css" rel="stylesheet">
+    <link href="./static/css/main.dd197b4c.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,6 +53,7 @@
                 <li>Click the floating button to open the chat interface</li>
                 <li>Use voice or text to interact</li>
                 <li>Watch the avatar animate when speaking</li>
+                <li>See real-time text responses in the chat</li>
                 <li>See the pulsing ring effect during audio activity</li>
             </ul>
         </div>
@@ -68,19 +69,24 @@
             position: 'bottom-right',
             theme: 'dark',
             initiallyOpen: false,
-            agentName: 'Compliance Cal'
+            agentName: 'Compliance Cal',
+            iconUrl: '/Cal.png'
         };
 
-        // Error handling
+        // Debug logging
         window.addEventListener('error', function(event) {
             const errorDiv = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
             if (errorDiv && errorText) {
                 errorText.textContent = event.message;
                 errorDiv.classList.add('visible');
+                console.error('Error:', event.message);
             }
         });
+
+        // Log when config is loaded
+        console.log('Config loaded:', window.VOICE_ASSISTANT_CONFIG);
     </script>
-    <script src="./static/js/main.b6603881.js"></script>
+    <script src="./static/js/main.bb788603.js"></script>
 </body>
 </html>
