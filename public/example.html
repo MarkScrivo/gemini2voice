@@ -40,6 +40,7 @@
             display: block;
         }
     </style>
+    <link href="./static/css/main.6bdbab6d.css" rel="stylesheet">
 </head>
 <body>
     <div class="content">
@@ -65,6 +66,10 @@
     <!-- Root element for React -->
     <div id="root"></div>
 
+    <!-- Load React -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
     <script>
         window.VOICE_ASSISTANT_CONFIG = {
             apiKey: 'AIzaSyDRh0uMq1_5beuhVW_B-kTZegWkAok8R3Y',
@@ -78,6 +83,8 @@
         // Debug logging
         window.addEventListener('load', function() {
             console.log('Config loaded:', window.VOICE_ASSISTANT_CONFIG);
+            console.log('React version:', React.version);
+            console.log('ReactDOM version:', ReactDOM.version);
         });
 
         // Error handling
@@ -91,7 +98,6 @@
             }
         });
     </script>
-    <script src="./static/js/main.885c881e.js"></script>
-    <link href="./static/css/main.6bdbab6d.css" rel="stylesheet">
+    <script src="./static/js/main.775447c1.js"></script>
 </body>
 </html>
