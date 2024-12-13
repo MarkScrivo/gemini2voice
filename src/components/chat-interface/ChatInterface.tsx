@@ -54,6 +54,11 @@ export const ChatInterface: React.FC = () => {
     client.on('content', handleContent);
     client.on('turncomplete', handleTurnComplete);
 
+    // Debug logging
+    client.on('log', (log) => {
+      console.log('Client log:', log);
+    });
+
     return () => {
       client.off('content', handleContent);
       client.off('turncomplete', handleTurnComplete);
